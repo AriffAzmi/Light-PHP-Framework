@@ -4,7 +4,8 @@
 ## Install the Application
 
 ### Composer
-Run `composer require ariffazmi/light-php-framework` on your terminal.
+Download from github repository.
+Run `composer install` on your terminal.
 
 
 
