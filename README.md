@@ -3,7 +3,14 @@
 
 ## Install the Application
 
-Run `composer install` on your terminal.
+### Composer
+Run `composer require ariffazmi/light-php-framework` on your terminal.
+
+
+
+
+
+# How To Use
 
 Open file .htaccess in root directory. Then change this value with the folder directory name
 
