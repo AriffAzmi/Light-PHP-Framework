@@ -164,6 +164,42 @@ Or you can edit this file at Pfw/App/Pfw/Server.php
     
         echo $req->username;
     }
+	
+	//For finding data based on user id
+	public function FindByUid(){
+
+        $user = new User();
+    	echo "<pre>";
+		//Put your id as parameter to that function
+		print_r($user->FindByUid(3));
+    }
+	
+	//For finding data based on user id and email
+	public function FindByUidAndEmail(){
+
+        $user = new User();
+    	echo "<pre>";
+		//Put your id as parameter to that function
+		print_r($user->FindByUidAndEmail(3,'john.doe@gmail.com'));
+    }
+	
+	//For finding data based on user id or email
+	public function FindByUidOrEmail(){
+
+        $user = new User();
+    	echo "<pre>";
+		//Put your id and email as parameter to that function
+		print_r($user->FindByUidOrEmail(3,'john.doe@gmail.com'));
+    }
+	
+	//For finding data based on user id between range
+	public function FindByUidBetween(){
+
+        $user = new User();
+    	echo "<pre>";
+		//Put your range as parameter to that function
+		print_r($user->FindByUidBetween(0,10));
+    }
     
     "username" as the example of <input type="text" name="username">
   
