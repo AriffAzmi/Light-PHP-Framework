@@ -12,7 +12,172 @@
 	
 	class Model
 	{	
+		
+		public function __call($name, $arguments)
+	    {	
+	    	if (preg_match("/FindBy/", $name)) {
+			    
+			    $obj = explode('FindBy', $name);
 
+			   	if (preg_match("/And/", $obj[1])) {
+			   		
+			   		$obj = explode("And", $obj[1]);
+
+			   		$objCondition = implode("=:".implode(" AND ", array_values($obj))."=:", array_values($obj));
+					
+					$keyBind = implode(",:", array_values($obj));
+					$keyBind = ":".$keyBind;
+					$value1 = implode(",", $arguments);
+
+			   		/**
+					*
+					* @return array for bind paramater
+					*/
+					$groups_array = array_map('trim',explode(',', $keyBind));
+					$functions_array = array_map('trim',explode(',', $value1));
+
+					$final = array();
+					for ($i = 0; $i <= count($groups_array); $i++) {
+					    $final[$groups_array[$i]] = $functions_array[$i];
+					}
+
+					$bindParam = array_combine($groups_array, $functions_array);
+					$limit = "";
+			   	}
+			   	elseif (preg_match("/Or/", $obj[1])) {
+			   		
+			   		$obj = explode("Or", $obj[1]);
+
+			   		$objCondition = implode("=:".implode(" OR ", array_values($obj))."=:", array_values($obj));
+					
+					$keyBind = implode(",:", array_values($obj));
+					$keyBind = ":".$keyBind;
+					$value1 = implode(",", $arguments);
+
+			   		/**
+					*
+					* @return array for bind paramater
+					*/
+					$groups_array = array_map('trim',explode(',', $keyBind));
+					$functions_array = array_map('trim',explode(',', $value1));
+
+					$final = array();
+					for ($i = 0; $i <= count($groups_array); $i++) {
+					    $final[$groups_array[$i]] = $functions_array[$i];
+					}
+
+					$bindParam = array_combine($groups_array, $functions_array);
+					$limit = "";
+			   	}
+			   	elseif (preg_match("/Between/", $obj[1])) {
+			   		
+			   		$obj = explode("Between", $obj[1]);
+
+			   		$arguments = (count($arguments) <= 1 ? die('Between statement only accept 2 parameter to be check') : $arguments);
+			   		
+			   		$objCondition = $obj[0]." BETWEEN :".implode(" AND :", $arguments);
+
+					/**
+					*
+					* @return array for bind paramater
+					*/
+					$key = ":".implode(" AND :", $arguments);
+					$groups_array = array_map('trim',explode("AND", $key));
+					$functions_array = array_map('trim',$arguments);
+
+					$final = array();
+					for ($i = 0; $i <= count($groups_array); $i++) {
+					    $final[$groups_array[$i]] = $functions_array[$i];
+					}
+
+					$bindParam = array_combine($groups_array, $functions_array);
+					$limit = "";
+			   	}
+			   	elseif (preg_match("/LessThan/", $obj[1])) {
+			   	
+			   		$obj = explode("LessThan", $obj[1]);
+			   		$arguments = (count($arguments) > 1 ? die('LessThan statement only accept 1 parameter to be check') : $arguments[0]);
+
+			   		$objCondition = $obj[0]." < :".$obj[0];
+			   	
+					$bindParam = [
+						':'.$obj[0].'' => $arguments
+					];
+					$limit = "";
+			   	}
+			   	elseif (preg_match("/GreaterThan/", $obj[1])) {
+			   	
+			   		$obj = explode("GreaterThan", $obj[1]);
+			   		$arguments = (count($arguments) > 1 ? die('GreaterThan statement only accept 1 parameter to be check') : $arguments[0]);
+
+			   		$objCondition = $obj[0]." > :".$obj[0];
+			   	
+					$bindParam = [
+						':'.$obj[0].'' => $arguments
+					];
+					$limit = "";
+			   	}
+			   	elseif (preg_match("/IsNull/", $obj[1])) {
+			   	
+			   		$obj = explode("IsNull", $obj[1]);
+
+			   		$objCondition = $obj[0]." =:".$obj[0];
+			   	
+					$bindParam = [
+						':'.$obj[0].'' => null
+					];
+					$limit = "LIMIT 1";
+			   	}
+			   	elseif (preg_match("/Like/", $obj[1])) {
+			   	
+			   		$obj = explode("Like", $obj[1]);
+			   		$arguments = (count($arguments) > 1 ? die('Like statement only accept 1 parameter to be check') : $arguments[0]);
+
+			   		$objCondition = $obj[0]." LIKE :".$obj[0];
+			   	
+					$bindParam = [
+						':'.$obj[0].'' => $arguments
+					];
+					$limit = "LIMIT 1";
+			   	}
+			   	elseif (preg_match("/Containing/", $obj[1])) {
+			   	
+			   		$obj = explode("Containing", $obj[1]);
+			   		$arguments = (count($arguments) > 1 ? die('Containing statement only accept 1 parameter to be check') : $arguments[0]);
+
+			   		$objCondition = $obj[0]." LIKE :".$obj[0];
+			   	
+					$bindParam = [
+						':'.$obj[0].'' => '%'.$arguments.'%'
+					];
+					$limit = "";
+			   	}
+			   	else{
+
+				    $objCondition = $obj[1]."=:".$obj[1];
+				    $bindParam = [
+				    	':'.$obj[1].'' => $arguments[0]
+				    ];
+
+				    $limit = "LIMIT 1";
+			   	}
+
+			   	// $prepareString = "SELECT * FROM $this->table WHERE $objCondition $limit";
+			    // return [$prepareString,$objCondition,$bindParam];
+
+			    $prepare = DB::db_connect()->prepare("SELECT * FROM $this->table WHERE $objCondition $limit");
+			    $prepare->execute($bindParam);
+
+			    $prepareData = $prepare->fetchAll(PDO::FETCH_OBJ);
+
+			    return $prepareData;
+
+			} else {
+			    
+			    die("The called function was not provided by this ORM. <br>Please write your own query instead by using this function query().<br>Refer to docs for further info.");
+			}
+	        
+	    }
 		/**
 		*
 		* @return function to save data
