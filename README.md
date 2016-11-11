@@ -192,13 +192,58 @@ Or you can edit this file at Pfw/App/Pfw/Server.php
 		print_r($user->FindByUidOrEmail(3,'john.doe@gmail.com'));
     }
 	
-	//For finding data based on user id between range
+	//For finding data based on user id between specific range
 	public function FindByUidBetween(){
 
         $user = new User();
     	echo "<pre>";
 		//Put your range as parameter to that function
 		print_r($user->FindByUidBetween(0,10));
+    }
+	
+	//For finding data based on user id less than specific range
+	public function FindByUidLessThan(){
+
+        $user = new User();
+    	echo "<pre>";
+		//Put your range as parameter to that function
+		print_r($user->FindByUidLessThan(10));
+    }
+	
+	//For finding data based on user id less greater than specific range
+	public function FindByUidGreaterThan(){
+
+        $user = new User();
+    	echo "<pre>";
+		//Put your range as parameter to that function
+		print_r($user->FindByUidGreaterThan(10));
+    }
+	
+	//For finding data based on user status is null
+	public function FindByStatusIsNull(){
+
+        $user = new User();
+    	echo "<pre>";
+		//Put your range as parameter to that function
+		print_r($user->FindByStatusIsNull());
+    }
+	
+	//For finding data based on username like without %% symbol
+	public function FindByUsernameLike(){
+
+        $user = new User();
+    	echo "<pre>";
+		//Put your name as parameter to that function
+		print_r($user->FindByUsernameLike('John Doe'));
+    }
+	
+	//For finding data based on username like with %% symbol
+	public function FindByUsernameContaining(){
+
+        $user = new User();
+    	echo "<pre>";
+		//Put your name as parameter to that function
+		print_r($user->FindByUsernameContaining('John Doe'));
     }
     
     "username" as the example of <input type="text" name="username">
