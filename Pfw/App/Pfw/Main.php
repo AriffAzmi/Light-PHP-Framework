@@ -2,6 +2,8 @@
 
 	namespace App\Pfw;
 
+	use \App\Http\Request as Request;
+
 	class Main
 	{
 		
@@ -28,6 +30,7 @@
 
 		private $_notFound;
 
+		private $req;
 		function __construct($arrOptions='')
 		{
 			
@@ -44,6 +47,8 @@
 				}
 				
 			}
+
+			$this->req = new Request();
 		}
 
 		/**
@@ -234,6 +239,7 @@
 			/**
 			* List through the stored URI's
 			*/
+			$matched = false;
 
 			foreach ($this->_listUri as $listKey => $listUri)
 			{
@@ -243,8 +249,6 @@
 			 	*/				
 				if (preg_match("#^$listUri$#", $uri))
 				{
-					
-
 
 					switch (strtoupper($this->_listMethod[$listKey])) {
 						
@@ -327,9 +331,53 @@
 				}
 			}
 			if(!$matched) {
-		        if(isset($this->_notFound)) {
-	                call_user_func($this->_notFound);
-		        }
+
+				if ($_SESSION['debug']) {
+					
+					$debug = debug_backtrace();
+
+					echo '<script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>';
+			    	echo '<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>';
+			    	echo '<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">';
+
+			    	$errMsg='<div class="col-md-8 col-md-offset-2" style="margin-top: 5%;">
+				 	<center>
+				 		<h1>PFW Application Error</h1>
+				 		<h2>Requested URI ('.$this->req->uri.') not registered in index.php file</h2>
+				 	</center>
+				 	<hr>				 	
+				 	<div class="panel-group">';
+					$errMsgTitle='';
+					$errMsgBody='';
+					$i=0;
+				 	foreach ($debug as $key => $value) {
+				 		
+				 		$i++;
+
+				 		$errMsgBody.='<div class="panel panel-danger">
+				      		<div class="panel-heading">
+					        <h4 class="panel-title">
+					          <a data-toggle="collapse" href="#collapse'.$key.'">('.$i.')'.$debug[$key]['file'].'</a>
+					        </h4>
+				      	</div>
+				      	<div id="collapse'.$key.'" class="panel-collapse collapse">
+					        <div class="panel-body" style="background-color: #ABB7B7;">
+					        Line: '.$debug[$key]['line'].'
+					        <br>
+					        Function: '.$debug[$key]['class']."->".$debug[$key]['function'].'()
+					        </div>
+					      </div>
+					    </div>';
+				 	}
+				 	$errMsg.=$errMsgBody.'</div></div>';				 	
+				 	echo $errMsg;
+				}
+				else{
+
+			        if(isset($this->_notFound)) {
+		                call_user_func($this->_notFound);
+			        }
+				}
 		    }
 		}
 
